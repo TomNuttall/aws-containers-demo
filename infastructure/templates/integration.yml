@@ -1,0 +1,91 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: 'EventRule, ECR/ECS and GitHub role'
+
+Parameters:
+  ProjectPrefix:
+    Type: String
+    Default: 'demo'
+    Description: 'Name of Project prefix'
+  ProjectName:
+    Type: String
+    Description: 'Name of Project'
+  ProjectRepo:
+    Type: 'String'
+    Description: 'Repo Path i.e GitHubUser/RepoName'
+
+Resources:
+  # ScheduledRule:
+  #   Type: AWS::Scheduler::Schedule
+  #   Properties:
+  #     Description: !Sub '${ProjectPrefix}-scheduler-${ProjectName}'
+  #     ScheduleExpression: 'cron(30 12 ? * 1 *)'
+  #     FlexibleTimeWindow:
+  #       Mode: FLEXIBLE
+  #       MaximumWindowInMinutes: 15
+  #     Target:
+  #       Arn: !GetAtt Lambda.Arn
+  #       RoleArn: !GetAtt ScheduleRole.Arn
+  #   DependsOn:
+  #     - ScheduleRole
+
+  # ScheduleRole:
+  #   Type: 'AWS::IAM::Role'
+  #   Properties:
+  #     RoleName: !Sub '${ProjectPrefix}-role-${ProjectName}-scheduler'
+  #     AssumeRolePolicyDocument:
+  #       Version: '2012-10-17'
+  #       Statement:
+  #         - Effect: 'Allow'
+  #           Principal:
+  #             Service:
+  #               - 'scheduler.amazonaws.com'
+  #           Action:
+  #             - 'sts:AssumeRole'
+  #     Policies:
+  #       - PolicyName: !Sub '${ProjectPrefix}-policy-${ProjectName}-scheduler'
+  #         PolicyDocument:
+  #           Version: '2012-10-17'
+  #           Statement:
+  #             - Effect: 'Allow'
+  #               Action: 'lambda:InvokeFunction'
+  #               Resource: !GetAtt Lambda.Arn
+  ECR:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: 'ecs-demo'
+      ImageScanningConfiguration:
+        ScanOnPush: true
+
+  GitHubActionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Sub '${ProjectPrefix}-role-${ProjectName}-github-ecr'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Federated:
+                - !Sub 'arn:aws:iam::${AWS::AccountId}:oidc-provider/token.actions.githubusercontent.com'
+            Action:
+              - 'sts:AssumeRoleWithWebIdentity'
+            Condition:
+              StringEquals:
+                token.actions.githubusercontent.com:aud: 'sts.amazonaws.com'
+              StringLike:
+                token.actions.githubusercontent.com:sub: !Sub 'repo:${ProjectRepo}:*'
+      Policies:
+        - PolicyName: !Sub '${ProjectPrefix}-policy-${ProjectName}-github-lambda'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: 'Allow'
+                Action:
+                  - 'ecr:BatchGetImage'
+                  - 'ecr:BatchCheckLayerAvailability'
+                  - 'ecr:CompleteLayerUpload'
+                  - 'ecr:GetDownloadUrlForLayer'
+                  - 'ecr:InitiateLayerUpload'
+                  - 'ecr:PutImage'
+                  - 'ecr:UploadLayerPart'
+                Resource: !GetAtt ECR.Arn
