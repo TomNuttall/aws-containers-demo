@@ -1,0 +1,9 @@
+{
+  "name": "demo_ecs",
+  "version": "1.0.0",
+  "author": "Tom Nuttall <tsnuttall@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "docker:build": "docker build ./infastructure/container"
+  }
+}
