@@ -82,6 +82,9 @@ Resources:
               - Effect: 'Allow'
                 Action:
                   - 'ecr:GetAuthorizationToken'
+                Resource: '*'
+              - Effect: 'Allow'
+                Action:
                   - 'ecr:BatchGetImage'
                   - 'ecr:BatchCheckLayerAvailability'
                   - 'ecr:CompleteLayerUpload'
