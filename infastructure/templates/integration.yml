@@ -53,6 +53,21 @@ Resources:
     Type: AWS::ECR::Repository
     Properties:
       RepositoryName: 'ecs-demo'
+      LifecyclePolicy:
+        LifecyclePolicyText: |
+          {
+            "rules": [
+            {
+              "rulePriority": 1,
+              "description": "Remove untagged images",
+              "selection": {
+                "tagStatus": "untagged",
+                "countType": "imageCountMoreThan",
+                "countNumber": 1
+              },
+              "action": { "type": "expire" }
+            }]
+          }
       ImageScanningConfiguration:
         ScanOnPush: true
 
