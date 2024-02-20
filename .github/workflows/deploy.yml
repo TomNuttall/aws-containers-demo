@@ -19,7 +19,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: get-npm-version
+      - name: Package Version
         id: package-version
         uses: martinbeentjes/npm-get-version-action@v1.3.1
 
@@ -35,9 +35,9 @@ jobs:
 
       - name: Build, tag, and push docker image to Amazon ECR
         env:
-          REGISTRY: ${{ steps.package-version.outputs.current-version }}
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: ecs-demo
-          IMAGE_TAG: ${{ github.sha }}
+          IMAGE_TAG: ${{ steps.package-version.outputs.current-version }}
         run: |
           docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG ./app
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
