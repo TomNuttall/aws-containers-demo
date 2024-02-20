@@ -4,7 +4,7 @@
 
 Backend
 <img
-  src='../docs/backend_diagram.png'
+  src='./docs/backend_diagram.png'
   raw=true
   alt='AWS Backend Architecture Diagram'
   width="100%"
