@@ -10,8 +10,17 @@ Parameters:
     Type: String
     Description: 'Name of Project'
   ProjectRepo:
-    Type: 'String'
+    Type: String
     Description: 'Repo Path i.e GitHubUser/RepoName'
+  # Subnet:
+  #   Type: String
+  #   Description: 'VPC Subnet'
+  # SecurityGroup:
+  #   Type: String
+  #   Description: 'Security Group'
+  Image:
+    Type: String
+    Description: 'repo:latest'
 
 Resources:
   # ScheduledRule:
@@ -49,6 +58,54 @@ Resources:
   #             - Effect: 'Allow'
   #               Action: 'lambda:InvokeFunction'
   #               Resource: !GetAtt Lambda.Arn
+
+  # ECSService:
+  #   Type: AWS::ECS::Service
+  #   Properties:
+  #     ServiceName: !Sub '${ProjectPrefix}-ecs-service-${ProjectName}'
+  #     Cluster: !Ref ECSCluster
+  #     TaskDefinition: !Ref ECSTask
+  #     LaunchType: FARGATE
+  #     NetworkConfiguration:
+  #       AwsvpcConfiguration:
+  #         AssignPublicIp: ENABLED
+  #         SecurityGroups:
+  #           - !Ref SecurityGroup
+  #         Subnets:
+  #           - !Ref Subnet
+
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Sub '${ProjectPrefix}-ecs-cluster-${ProjectName}'
+
+  ECSTask:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      ContainerDefinitions:
+        - Name: !Sub '${ProjectPrefix}-ecs-task-${ProjectName}'
+          Image: !Ref Image
+          Essential: true
+      ExecutionRoleArn: !GetAtt ECSTaskExecutionRole.Arn
+      NetworkMode: 'awsvpc'
+      Cpu: 1 vCPU
+      Memory: 2 GB
+      RequiresCompatibilities:
+        - 'FARGATE'
+
+  ECSTaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${ProjectPrefix}-role-${ProjectName}-github-ecs-task'
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy'
+
   ECR:
     Type: AWS::ECR::Repository
     Properties:

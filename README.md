@@ -1,5 +1,7 @@
 # ecs-demo
 
+Container demo project.
+
 ## Architecture Diagram
 
 Backend
