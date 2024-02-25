@@ -12,72 +12,77 @@ Parameters:
   ProjectRepo:
     Type: String
     Description: 'Repo Path i.e GitHubUser/RepoName'
-  # Subnet:
-  #   Type: String
-  #   Description: 'VPC Subnet'
-  # SecurityGroup:
-  #   Type: String
-  #   Description: 'Security Group'
+  Subnet:
+    Type: String
+    Description: 'VPC Subnet'
+  SecurityGroup:
+    Type: String
+    Description: 'Security Group'
   Image:
     Type: String
     Description: 'repo:latest'
+  # Storage:
+  #   Type: String
+  #   Description: 'S3 Bucket Arn'
 
 Resources:
-  # ScheduledRule:
-  #   Type: AWS::Scheduler::Schedule
-  #   Properties:
-  #     Description: !Sub '${ProjectPrefix}-scheduler-${ProjectName}'
-  #     ScheduleExpression: 'cron(30 12 ? * 1 *)'
-  #     FlexibleTimeWindow:
-  #       Mode: FLEXIBLE
-  #       MaximumWindowInMinutes: 15
-  #     Target:
-  #       Arn: !GetAtt Lambda.Arn
-  #       RoleArn: !GetAtt ScheduleRole.Arn
-  #   DependsOn:
-  #     - ScheduleRole
+  ScheduledRule:
+    Type: AWS::Scheduler::Schedule
+    Properties:
+      Description: !Sub '${ProjectPrefix}-scheduler-${ProjectName}'
+      ScheduleExpression: 'cron(30 9 1 * ? *)'
+      FlexibleTimeWindow:
+        Mode: FLEXIBLE
+        MaximumWindowInMinutes: 15
+      Target:
+        Arn: !GetAtt ECSCluster.Arn
+        RoleArn: !GetAtt ScheduleRole.Arn
+        EcsParameters:
+          LaunchType: FARGATE
+          TaskDefinitionArn: !Ref ECSTask
+          NetworkConfiguration:
+            AwsvpcConfiguration:
+              AssignPublicIp: ENABLED
+              SecurityGroups:
+                - !Ref SecurityGroup
+              Subnets:
+                - !Ref Subnet
 
-  # ScheduleRole:
-  #   Type: 'AWS::IAM::Role'
-  #   Properties:
-  #     RoleName: !Sub '${ProjectPrefix}-role-${ProjectName}-scheduler'
-  #     AssumeRolePolicyDocument:
-  #       Version: '2012-10-17'
-  #       Statement:
-  #         - Effect: 'Allow'
-  #           Principal:
-  #             Service:
-  #               - 'scheduler.amazonaws.com'
-  #           Action:
-  #             - 'sts:AssumeRole'
-  #     Policies:
-  #       - PolicyName: !Sub '${ProjectPrefix}-policy-${ProjectName}-scheduler'
-  #         PolicyDocument:
-  #           Version: '2012-10-17'
-  #           Statement:
-  #             - Effect: 'Allow'
-  #               Action: 'lambda:InvokeFunction'
-  #               Resource: !GetAtt Lambda.Arn
-
-  # ECSService:
-  #   Type: AWS::ECS::Service
-  #   Properties:
-  #     ServiceName: !Sub '${ProjectPrefix}-ecs-service-${ProjectName}'
-  #     Cluster: !Ref ECSCluster
-  #     TaskDefinition: !Ref ECSTask
-  #     LaunchType: FARGATE
-  #     NetworkConfiguration:
-  #       AwsvpcConfiguration:
-  #         AssignPublicIp: ENABLED
-  #         SecurityGroups:
-  #           - !Ref SecurityGroup
-  #         Subnets:
-  #           - !Ref Subnet
+  ScheduleRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Sub '${ProjectPrefix}-role-${ProjectName}-scheduler'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service:
+                - 'scheduler.amazonaws.com'
+            Action:
+              - 'sts:AssumeRole'
+      Policies:
+        - PolicyName: !Sub '${ProjectPrefix}-policy-${ProjectName}-scheduler'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: 'Allow'
+                Action: 'iam:PassRole'
+                Resource: '*'
+              - Effect: 'Allow'
+                Action: 'ecs:RunTask'
+                Resource: !Ref ECSTask
 
   ECSCluster:
     Type: AWS::ECS::Cluster
     Properties:
       ClusterName: !Sub '${ProjectPrefix}-ecs-cluster-${ProjectName}'
+
+  ECSLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/ecs/${ProjectPrefix}-ecs-task-${ProjectName}'
+      RetentionInDays: 14
 
   ECSTask:
     Type: AWS::ECS::TaskDefinition
@@ -86,6 +91,13 @@ Resources:
         - Name: !Sub '${ProjectPrefix}-ecs-task-${ProjectName}'
           Image: !Ref Image
           Essential: true
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref ECSLogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: !Ref ProjectName
+      #TaskRoleArn: !GetAtt ECSTaskContainerRole.Arn
       ExecutionRoleArn: !GetAtt ECSTaskExecutionRole.Arn
       NetworkMode: 'awsvpc'
       Cpu: 1 vCPU
@@ -93,10 +105,23 @@ Resources:
       RequiresCompatibilities:
         - 'FARGATE'
 
+  # ECSTaskContainerRole:
+  #   Type: AWS::IAM::Role
+  #   Properties:
+  #     RoleName: !Sub '${ProjectPrefix}-role-${ProjectName}-ecs-container'
+  #     Policies:
+  #       - PolicyName: !Sub '${ProjectPrefix}-policy-${ProjectName}-ecs'
+  #         PolicyDocument:
+  #           Version: '2012-10-17'
+  #           Statement:
+  #             - Effect: 'Allow'
+  #               Action: s3:*
+  #               Resource: !Ref Storage
+
   ECSTaskExecutionRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub '${ProjectPrefix}-role-${ProjectName}-github-ecs-task'
+      RoleName: !Sub '${ProjectPrefix}-role-${ProjectName}-ecs-task'
       AssumeRolePolicyDocument:
         Statement:
           - Effect: Allow
@@ -105,6 +130,14 @@ Resources:
             Action: 'sts:AssumeRole'
       ManagedPolicyArns:
         - 'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy'
+      Policies:
+        - PolicyName: !Sub '${ProjectPrefix}-policy-${ProjectName}-ecs'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: 'Allow'
+                Action: logs:*
+                Resource: !GetAtt ECSLogGroup.Arn
 
   ECR:
     Type: AWS::ECR::Repository
@@ -147,7 +180,7 @@ Resources:
               StringLike:
                 token.actions.githubusercontent.com:sub: !Sub 'repo:${ProjectRepo}:*'
       Policies:
-        - PolicyName: !Sub '${ProjectPrefix}-policy-${ProjectName}-github-lambda'
+        - PolicyName: !Sub '${ProjectPrefix}-policy-${ProjectName}-github-ecr'
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
