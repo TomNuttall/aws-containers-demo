@@ -1,6 +1,6 @@
 # ecs-demo
 
-Demo Project: ECS task runs to process zip files uploaded to an S3 bucket.
+Demo Project: Run an ECS task to process zip files uploaded to an S3 bucket.
 
 ## Architecture Diagram
 
