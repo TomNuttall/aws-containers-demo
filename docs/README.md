@@ -1,6 +1,13 @@
-# Docs
+# Infastructure
 
-## Install
+## Overview
+
+- CloudFormation: Used to deploy infastructure on AWS.
+- GitHub action: deploy.yml runs on change to app folder. Builds app image and pushes to ECR
+
+## Diagrams
+
+### Install
 
 Install graphvis
 
@@ -21,7 +28,7 @@ Install diagrams package
 pip install diagrams
 ```
 
-## Generate architecture diagram
+### Generate architecture diagram
 
 ```bash
 python backend_diagram.py

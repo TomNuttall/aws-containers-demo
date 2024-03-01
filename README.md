@@ -12,3 +12,10 @@ Backend
   width="100%"
   height="auto"
 />
+
+## Enviromemnt
+
+| Name           | Reason                 |
+| -------------- | ---------------------- |
+| INGRESS_BUCKET | Bucket for ingress zip |
+| REPORT_BUCKET  | Bucket for output      |
