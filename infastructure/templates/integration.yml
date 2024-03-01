@@ -114,6 +114,11 @@ Resources:
         - Name: !Sub '${ProjectPrefix}-ecs-task-${ProjectName}'
           Image: !Ref Image
           Essential: true
+          Environment:
+            - Name: INGRESS_BUCKET
+              Value: !Ref IngestBucketName
+            - Name: REPORT_BUCKET
+              Value: !Ref ReportBucketName
           LogConfiguration:
             LogDriver: awslogs
             Options:
@@ -148,6 +153,7 @@ Resources:
                   - 's3:GetObject'
                   - 's3:GetBucketLocation'
                   - 's3:ListBucket'
+                  - 's3:DeleteObject'
                 Resource: !Sub 'arn:aws:s3:::${IngestBucketName}'
               - Effect: 'Allow'
                 Action:

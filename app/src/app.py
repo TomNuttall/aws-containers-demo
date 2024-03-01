@@ -21,6 +21,7 @@ if __name__ == "__main__":
   if args.envPath:
     load_dotenv(dotenv_path=Path(args.envPath))
 
+  print(os.environ)
   bucket_name = os.environ.get("INGRESS_BUCKET")
   if bucket_name:
     list_bucket(bucket_name)
