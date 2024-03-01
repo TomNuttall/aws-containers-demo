@@ -11,9 +11,6 @@ def list_bucket(bucket_name):
   client = boto3.client('s3')
   response = client.list_objects(Bucket=bucket_name)
   print(response)
-
-  # for item in response.get('Contents'):
-  #   print(item)
 	
 
 if __name__ == "__main__":
