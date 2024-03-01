@@ -1,6 +1,6 @@
 # ecs-demo
 
-Container demo project.
+Demo project using containers with AWS
 
 ## Architecture Diagram
 
