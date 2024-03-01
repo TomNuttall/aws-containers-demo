@@ -21,48 +21,71 @@ Parameters:
   Image:
     Type: String
     Description: 'repo:latest'
-  # Storage:
-  #   Type: String
-  #   Description: 'S3 Bucket Arn'
+  IngestBucketName:
+    Type: String
+    Description: 'S3 Bucket'
+  ReportBucketName:
+    Type: String
+    Description: 'S3 Bucket'
 
 Resources:
-  ScheduledRule:
-    Type: AWS::Scheduler::Schedule
+  EventRule:
+    Type: AWS::Events::Rule
     Properties:
-      Description: !Sub '${ProjectPrefix}-scheduler-${ProjectName}'
-      ScheduleExpression: 'cron(30 9 1 * ? *)'
-      FlexibleTimeWindow:
-        Mode: FLEXIBLE
-        MaximumWindowInMinutes: 15
-      Target:
-        Arn: !GetAtt ECSCluster.Arn
-        RoleArn: !GetAtt ScheduleRole.Arn
-        EcsParameters:
-          LaunchType: FARGATE
-          TaskDefinitionArn: !Ref ECSTask
-          NetworkConfiguration:
-            AwsvpcConfiguration:
-              AssignPublicIp: ENABLED
-              SecurityGroups:
-                - !Ref SecurityGroup
-              Subnets:
-                - !Ref Subnet
+      Name: !Sub '${ProjectPrefix}-event-${ProjectName}'
+      EventPattern: !Sub |
+        {
+          "source": [
+            "aws.s3"
+          ],
+          "detail-type": [
+            "Object Created"
+          ],
+          "detail": {
+            "bucket": {
+              "name": [
+                "${IngestBucketName}"
+              ]
+            },
+            "object": {
+              "key": [
+                {
+                  "suffix": ".zip"
+                }
+              ]
+            }
+          }
+        }
+      Targets:
+        - Arn: !GetAtt ECSCluster.Arn
+          RoleArn: !GetAtt EventRole.Arn
+          Id: !Sub '${ProjectPrefix}-event-id-${ProjectName}'
+          EcsParameters:
+            LaunchType: FARGATE
+            TaskDefinitionArn: !Ref ECSTask
+            NetworkConfiguration:
+              AwsVpcConfiguration:
+                AssignPublicIp: ENABLED
+                SecurityGroups:
+                  - !Ref SecurityGroup
+                Subnets:
+                  - !Ref Subnet
 
-  ScheduleRole:
+  EventRole:
     Type: 'AWS::IAM::Role'
     Properties:
-      RoleName: !Sub '${ProjectPrefix}-role-${ProjectName}-scheduler'
+      RoleName: !Sub '${ProjectPrefix}-role-${ProjectName}-event'
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
           - Effect: 'Allow'
             Principal:
               Service:
-                - 'scheduler.amazonaws.com'
+                - 'events.amazonaws.com'
             Action:
               - 'sts:AssumeRole'
       Policies:
-        - PolicyName: !Sub '${ProjectPrefix}-policy-${ProjectName}-scheduler'
+        - PolicyName: !Sub '${ProjectPrefix}-policy-${ProjectName}-event'
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
@@ -97,7 +120,7 @@ Resources:
               awslogs-group: !Ref ECSLogGroup
               awslogs-region: !Ref AWS::Region
               awslogs-stream-prefix: !Ref ProjectName
-      #TaskRoleArn: !GetAtt ECSTaskContainerRole.Arn
+      TaskRoleArn: !GetAtt ECSTaskContainerRole.Arn
       ExecutionRoleArn: !GetAtt ECSTaskExecutionRole.Arn
       NetworkMode: 'awsvpc'
       Cpu: 1 vCPU
@@ -105,18 +128,32 @@ Resources:
       RequiresCompatibilities:
         - 'FARGATE'
 
-  # ECSTaskContainerRole:
-  #   Type: AWS::IAM::Role
-  #   Properties:
-  #     RoleName: !Sub '${ProjectPrefix}-role-${ProjectName}-ecs-container'
-  #     Policies:
-  #       - PolicyName: !Sub '${ProjectPrefix}-policy-${ProjectName}-ecs'
-  #         PolicyDocument:
-  #           Version: '2012-10-17'
-  #           Statement:
-  #             - Effect: 'Allow'
-  #               Action: s3:*
-  #               Resource: !Ref Storage
+  ECSTaskContainerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${ProjectPrefix}-role-${ProjectName}-ecs-container'
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Policies:
+        - PolicyName: !Sub '${ProjectPrefix}-policy-${ProjectName}-ecs'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: 'Allow'
+                Action:
+                  - 's3:GetObject'
+                  - 's3:GetBucketLocation'
+                  - 's3:ListBucket'
+                Resource: !Sub 'arn:aws:s3:::${IngestBucketName}'
+              - Effect: 'Allow'
+                Action:
+                  - 's3:PutObject'
+                  - 's3:PutObjectAcl'
+                Resource: !Sub 'arn:aws:s3:::${ReportBucketName}'
 
   ECSTaskExecutionRole:
     Type: AWS::IAM::Role

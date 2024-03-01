@@ -1,0 +1,25 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: 'Report storage'
+
+Parameters:
+  ProjectPrefix:
+    Type: String
+    Default: 'demo'
+    Description: 'Name of Project prefix'
+  ProjectName:
+    Type: String
+    Description: 'Name of Project'
+
+Resources:
+  IngestS3Bucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: !Sub '${ProjectPrefix}-bucket-${ProjectName}-ingest'
+      NotificationConfiguration:
+        EventBridgeConfiguration:
+          EventBridgeEnabled: true
+
+  ReportS3Bucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: !Sub '${ProjectPrefix}-bucket-${ProjectName}-reports'
