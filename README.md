@@ -1,10 +1,9 @@
 # ecs-demo
 
-Container demo project.
+Demo project using containers with AWS
 
 ## Architecture Diagram
 
-Backend
 <img
   src='./docs/backend_diagram.png'
   raw=true
