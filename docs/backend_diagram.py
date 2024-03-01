@@ -15,13 +15,13 @@ with Diagram("", filename="backend_diagram", outformat="png"):
 
     with Cluster(""):
         fargate = Fargate("Fargate")
-        Eventbridge("EventBridge") >> Edge(label="Run schedule first of month") >> fargate
+        S3("S3 Ingest Data") >> Eventbridge("EventBridge Rule") >> fargate
         
         with Cluster(""):
           ecs = ECS("ECS Task")
         
           fargate >> Edge(label="Launch") >> ecs >> Cloudwatch("Logs")
           ecs << ecr
-          ecs >> S3("Report Storage")
+          ecs >> S3("S3 Report")
 
   github_action_ecr >> Edge(label="Build + push image")  >> docker_image >> ecr
