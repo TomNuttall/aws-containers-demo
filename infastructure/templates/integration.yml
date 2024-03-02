@@ -174,12 +174,18 @@ Resources:
                   - 's3:GetObject'
                   - 's3:GetObjectAttributes'
                   - 's3:ListBucket'
-                  - 's3:DeleteObject'
-                Resource: !Sub 'arn:aws:s3:::${IngestBucketName}'
+                Resource:
+                  - !Sub 'arn:aws:s3:::${IngestBucketName}'
+                  - !Sub 'arn:aws:s3:::${IngestBucketName}/*'
               - Effect: 'Allow'
                 Action:
+                  - 's3:GetObject'
+                  - 's3:GetObjectAttributes'
+                  - 's3:ListBucket'
                   - 's3:PutObject'
-                Resource: !Sub 'arn:aws:s3:::${ReportBucketName}'
+                Resource:
+                  - !Sub 'arn:aws:s3:::${ReportBucketName}'
+                  - !Sub 'arn:aws:s3:::${ReportBucketName}/*'
 
   ECSTaskExecutionRole:
     Type: AWS::IAM::Role
