@@ -172,14 +172,13 @@ Resources:
               - Effect: 'Allow'
                 Action:
                   - 's3:GetObject'
-                  - 's3:GetBucketLocation'
+                  - 's3:GetObjectAttributes'
                   - 's3:ListBucket'
                   - 's3:DeleteObject'
                 Resource: !Sub 'arn:aws:s3:::${IngestBucketName}'
               - Effect: 'Allow'
                 Action:
                   - 's3:PutObject'
-                  - 's3:PutObjectAcl'
                 Resource: !Sub 'arn:aws:s3:::${ReportBucketName}'
 
   ECSTaskExecutionRole:
