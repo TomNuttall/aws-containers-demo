@@ -1,10 +1,3 @@
-# Infastructure
-
-## Overview
-
-- CloudFormation: Used to deploy infastructure on AWS.
-- GitHub action: deploy.yml runs on change to app folder. Builds app image and pushes to ECR
-
 ## Diagrams
 
 ### Install
