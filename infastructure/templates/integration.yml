@@ -60,6 +60,29 @@ Resources:
         - Arn: !GetAtt ECSCluster.Arn
           RoleArn: !GetAtt EventRole.Arn
           Id: !Sub '${ProjectPrefix}-event-id-${ProjectName}'
+          InputTransformer:
+            InputTemplate: !Sub |
+              {
+                "containerOverrides": [
+                  {
+                    "name": "${ProjectPrefix}-ecs-task-${ProjectName}",
+                    "environment": [
+                      {
+                        "name": "INGRESS_BUCKET",
+                        "value": "<bucket>"
+                      },
+                      {
+                        "name": "S3_KEY",
+                        "value": "<keyname>"
+                      }
+                    ]
+                  }
+                ]
+              }
+
+            InputPathsMap:
+              'keyname': '$.detail.object.key'
+              'bucket': '$.detail.bucket.name'
           EcsParameters:
             LaunchType: FARGATE
             TaskDefinitionArn: !Ref ECSTask
@@ -115,8 +138,6 @@ Resources:
           Image: !Ref Image
           Essential: true
           Environment:
-            - Name: INGRESS_BUCKET
-              Value: !Ref IngestBucketName
             - Name: REPORT_BUCKET
               Value: !Ref ReportBucketName
           LogConfiguration:
