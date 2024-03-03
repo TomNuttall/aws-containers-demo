@@ -29,7 +29,7 @@ jobs:
           REPOSITORY: ecs-demo
           IMAGE_TAG: ${{ steps.package-version.outputs.current-version }}
         run: |
-          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAGG --progress=plain --no-cache --target=test ./app
+          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG --progress=plain --no-cache --target=test ./app
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
