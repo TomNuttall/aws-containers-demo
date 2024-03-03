@@ -4,6 +4,8 @@
   "author": "Tom Nuttall <tsnuttall@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "docker:build": "docker build -t $npm_package_name:$npm_package_version ./app"
+    "dev": "cd app && docker compose --profile app up --build",
+    "test": "cd app && docker compose --profile test up --build",
+    "stop": "cd app && docker compose down"
   }
 }
