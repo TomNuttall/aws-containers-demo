@@ -30,7 +30,7 @@ if __name__ == "__main__":
     writer = csv.DictWriter(csv_file, delimiter=',', fieldnames = ['id', 'name'])
     writer.writeheader()
     writer.writerow({'id': '1', 'name': 'Test User'})
-    print("CSV")
+    print("CSV CREATED")
   print(os.listdir())
 
   
