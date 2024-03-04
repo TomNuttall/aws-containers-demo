@@ -13,8 +13,4 @@ services:
     build:
       context: .
       target: test
-    env_file:
-      - .env
-    volumes:
-      - ~/.aws:/root/.aws
     profiles: [test]
