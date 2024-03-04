@@ -1,50 +1,65 @@
 import boto3
-from pathlib import Path
-import os
 import csv
+import glob
+import json
+import os
+import datetime as dt
 from zipfile import ZipFile
 
 
-def get_object(bucket_name, object_name):
-  """ ."""
-	
+def download_zip(bucket_name, object_name):
+  """ Download object key from bucket."""
+
   if not bucket_name or not object_name:
-    return
+    return None
   
   client = boto3.client('s3')
-  with open('temp.zip', 'wb') as file:
-    client.download_fileobj(bucket_name, object_name, file)
-  
-  return file
+  client.download_file(bucket_name, object_name, object_name)
+  return object_name
 
+
+def extract_files(zip_file, matches):
+  """ Extract zip and return csv file paths."""
 	
+  temp_path = os.path.join(os.getcwd(), "extract")
+  if not os.path.isdir(temp_path):
+    os.mkdir(temp_path)
+
+  with ZipFile(zip_file, 'r') as fp:  
+    fp.extractall(temp_path)
+
+  csv_files = glob.glob(os.path.join(temp_path, matches))
+  return csv_files
+
+
+def parse_file(csv_file):
+  """ Parse file and return number of rows."""
+
+  row_count = 0
+  with open(csv_file, 'r') as fp:
+    reader = csv.DictReader(fp, delimiter=',')
+    for row in reader:
+      row_count += 1
+
+  return row_count
+
+
+def upload_report(bucket_name, data):
+  """ Upload report data."""
+
+  date_obj = dt.datetime.now()
+  with open('data.json', 'w') as fp:
+    json.dump(data, fp, indent=2)
+
+  client = boto3.client('s3')
+  client.upload_file('data.json', bucket_name, f'report_{date_obj.strftime("%d/%m/%Y")}.json')
+
+
 if __name__ == "__main__":
-
-  print(os.listdir())
-  bucket = os.environ.get("INGRESS_BUCKET")
-  print(bucket)
-  print(os.environ.get("S3_KEY"))
-
-
-  with open('data.csv', 'w', newline='') as csv_file:
-    writer = csv.DictWriter(csv_file, delimiter=',', fieldnames = ['id', 'name'])
-    writer.writeheader()
-    writer.writerow({'id': '1', 'name': 'Test User'})
-    print("CSV CREATED 2")
-  print(os.listdir())
-
+  """ ."""
   
-  # # Create temp folder
-  # temp_path = os.path.join(os.getcwd(), "temp")
-  # if not os.path.isdir(temp_path):
-  #   os.mkdir(temp_path)      
-  # os.chdir(temp_path)
-
-  # # 
-  # file = get_object(os.environ.get("INGRESS_BUCKET"), os.environ.get("S3_KEY"))
-  # print(file)
-  
-  # with ZipFile('temp.zip', 'r') as archive:  
-  #   archive.extractall()docker compose run server npm run test
-
-  #client.upload_file(file_name, os.envrion("REPORT_BUCKET"), object_name)
+  zip_file = download_zip(os.environ.get("INGRESS_BUCKET"), os.environ.get("S3_KEY"))
+  files = extract_files(zip_file, "*.csv")
+  for file in files:
+    count = parse_file(file)
+    print(f"Parsed: {file} - {count}")

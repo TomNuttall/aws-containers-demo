@@ -1,5 +1,7 @@
 # App
 
+_Simple example app of reading file from event bucket, doing some processing and uploading output to report bucket_
+
 - Uses [boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/quickstart.html/) for aws services.
 
 ## Enviroment

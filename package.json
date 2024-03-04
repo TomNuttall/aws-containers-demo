@@ -4,8 +4,8 @@
   "author": "Tom Nuttall <tsnuttall@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "dev": "cd app && docker compose --profile app up --build",
-    "test": "cd app && docker compose --profile test up --build",
+    "dev": "cd app && docker compose --progress plain --profile app up --build",
+    "test": "cd app && docker compose --progress plain --profile test up --build",
     "stop": "cd app && docker compose down"
   }
 }
