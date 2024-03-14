@@ -11,7 +11,7 @@ services:
       - minionetwork
     profiles: [prod]
 
-  s3-storage:
+  s3:
     image: bitnami/minio:latest
     volumes:
       - 'minio_data:/data'
