@@ -1,5 +1,4 @@
 import boto3
-from botocore.config import Config
 import csv
 import glob
 import json
@@ -23,9 +22,7 @@ def download_zip(bucket_name, object_name):
     client = boto3.client('s3', \
                           endpoint_url='http://localhost:9000', \
                           aws_access_key_id=access_key, \
-                          aws_secret_access_key=secret_key, \
-                          aws_session_token=None, \
-                          config=Config(signature_version = 'v4'))
+                          aws_secret_access_key=secret_key)
   else:
     client = boto3.client(service_name='s3')
 
@@ -75,9 +72,7 @@ def upload_report(bucket_name, data):
     client = boto3.client('s3', \
                           endpoint_url='http://localhost:9000', \
                           aws_access_key_id=access_key, \
-                          aws_secret_access_key=secret_key, \
-                          aws_session_token=None, \
-                          config=Config(signature_version = 'v4'))
+                          aws_secret_access_key=secret_key)
   else:
     client = boto3.client('s3')
 
