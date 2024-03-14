@@ -7,10 +7,31 @@ services:
       - .env
     volumes:
       - ~/.aws:/root/.aws
-    profiles: [app]
+    networks:
+      - minionetwork
+    profiles: [prod]
+
+  s3-storage:
+    image: bitnami/minio:latest
+    volumes:
+      - 'minio_data:/data'
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    networks:
+      - minionetwork
+    profiles: [prod]
 
   demo-ecs-test:
     build:
       context: .
       target: test
     profiles: [test]
+
+networks:
+  minionetwork:
+    driver: bridge
+
+volumes:
+  minio_data:
+    driver: local

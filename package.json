@@ -4,8 +4,9 @@
   "author": "Tom Nuttall <tsnuttall@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "dev": "cd app && docker compose --progress plain --profile app up --build",
-    "test": "cd app && docker compose --progress plain --profile test up --build",
-    "stop": "cd app && docker compose down"
+    "dev": "cd app && docker compose --profile dev up --build demo-ecs",
+    "s3:start": "cd app && docker compose --profile dev up -d s3-storage",
+    "s3:stop": "cd app && docker compose down",
+    "test": "cd app && docker compose --profile test up --build"
   }
 }

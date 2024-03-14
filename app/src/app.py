@@ -1,4 +1,5 @@
 import boto3
+from botocore.config import Config
 import csv
 import glob
 import json
@@ -13,7 +14,21 @@ def download_zip(bucket_name, object_name):
   if not bucket_name or not object_name:
     return None
   
-  client = boto3.client('s3')
+  development = os.environ.get('DEVELOPMENT')
+  
+  if development:
+    access_key = os.environ.get('MINIO_ACCESS_KEY')
+    secret_key = os.environ.get('MINIO_SECRET_KEY')
+
+    client = boto3.client('s3', \
+                          endpoint_url='http://localhost:9000', \
+                          aws_access_key_id=access_key, \
+                          aws_secret_access_key=secret_key, \
+                          aws_session_token=None, \
+                          config=Config(signature_version = 'v4'))
+  else:
+    client = boto3.client(service_name='s3')
+
   client.download_file(bucket_name, object_name, object_name)
   return object_name
 
@@ -51,14 +66,31 @@ def upload_report(bucket_name, data):
   with open('data.json', 'w') as fp:
     json.dump(data, fp, indent=2)
 
-  client = boto3.client('s3')
+  development = os.environ.get('DEVELOPMENT')
+  
+  if development:
+    access_key = os.environ.get('MINIO_ACCESS_KEY')
+    secret_key = os.environ.get('MINIO_SECRET_KEY')
+
+    client = boto3.client('s3', \
+                          endpoint_url='http://localhost:9000', \
+                          aws_access_key_id=access_key, \
+                          aws_secret_access_key=secret_key, \
+                          aws_session_token=None, \
+                          config=Config(signature_version = 'v4'))
+  else:
+    client = boto3.client('s3')
+
   client.upload_file('data.json', bucket_name, f'report_{date_obj.strftime("%d/%m/%Y")}.json')
 
 
 if __name__ == "__main__":
   """ ."""
   
-  zip_file = download_zip(os.environ.get("INGRESS_BUCKET"), os.environ.get("S3_KEY"))
+  ingress_bucket = os.environ.get("INGRESS_BUCKET")
+  filename = os.environ.get("S3_KEY")
+
+  zip_file = download_zip(ingress_bucket, filename)
   files = extract_files(zip_file, "*.csv")
   for file in files:
     count = parse_file(file)
