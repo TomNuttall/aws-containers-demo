@@ -20,7 +20,7 @@ def download_zip(bucket_name, object_name):
     secret_key = os.environ.get('MINIO_SECRET_KEY')
 
     client = boto3.client('s3', \
-                          endpoint_url='http://localhost:9000', \
+                          endpoint_url='http://s3:9000', \
                           aws_access_key_id=access_key, \
                           aws_secret_access_key=secret_key)
   else:
@@ -70,7 +70,7 @@ def upload_report(bucket_name, data):
     secret_key = os.environ.get('MINIO_SECRET_KEY')
 
     client = boto3.client('s3', \
-                          endpoint_url='http://localhost:9000', \
+                          endpoint_url='http://s3:9000', \
                           aws_access_key_id=access_key, \
                           aws_secret_access_key=secret_key)
   else:
