@@ -76,13 +76,14 @@ def upload_report(bucket_name, data):
   else:
     client = boto3.client('s3')
 
-  client.upload_file('data.json', bucket_name, f'report_{date_obj.strftime("%d/%m/%Y")}.json')
+  client.upload_file('data.json', bucket_name, f'report_{date_obj.strftime("%d-%m-%Y")}.json')
 
 
 if __name__ == "__main__":
   """ ."""
   
   ingress_bucket = os.environ.get("INGRESS_BUCKET")
+  report_bucket = os.environ.get("REPORT_BUCKET")
   filename = os.environ.get("S3_KEY")
 
   zip_file = download_zip(ingress_bucket, filename)
@@ -90,3 +91,4 @@ if __name__ == "__main__":
   for file in files:
     count = parse_file(file)
     print(f"Parsed: {file} - {count}")
+  upload_report(report_bucket, { "parsedCount": count })
