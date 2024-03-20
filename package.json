@@ -4,9 +4,9 @@
   "author": "Tom Nuttall <tsnuttall@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "dev": "cd app && docker compose --profile prod up --build demo-ecs --remove-orphans",
+    "dev": "cd app && docker compose --profile prod up --build demo-ecs && docker image prune -f",
     "s3:start": "cd app && docker compose --profile prod up -d s3",
     "s3:stop": "cd app && docker compose down",
-    "test": "cd app && docker compose --profile test up --build --remove-orphans"
+    "test": "cd app && docker compose --profile test up --build && docker image prune -f"
   }
 }

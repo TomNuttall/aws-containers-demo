@@ -84,10 +84,10 @@ def test_parse_file(csv_file):
     # Arrange
   
     # Act
-    res = parse_file(csv_file)
+    count, summary = parse_file(csv_file)
 
     # Assert
-    assert res == 2
+    assert count == 2
 
 
 @mock_aws
@@ -100,10 +100,11 @@ def test_upload_report():
     s3 = boto3.client('s3', region_name='eu-west-2')
     s3.create_bucket(Bucket=bucket_name, CreateBucketConfiguration={'LocationConstraint': 'eu-west-2'})
   
-    report_data = { "rows": 2 }
+    filename = "report.csv"
+    report_data = { "max": 2 }
 
     # Act
-    upload_report(bucket_name, report_data)
+    upload_report(bucket_name, filename, report_data)
 
     res = s3.list_objects(Bucket=bucket_name)
 

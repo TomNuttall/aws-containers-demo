@@ -1,9 +1,9 @@
 import boto3
-import csv
 import glob
 import json
 import os
 import datetime as dt
+import pandas as pd
 from zipfile import ZipFile
 
 
@@ -47,16 +47,13 @@ def extract_files(zip_file, matches):
 def parse_file(csv_file):
   """ Parse file and return number of rows."""
 
-  row_count = 0
-  with open(csv_file, 'r') as fp:
-    reader = csv.DictReader(fp, delimiter=',')
-    for row in reader:
-      row_count += 1
+  csv_data = pd.read_csv(csv_file, delimiter=',') 
+  summary = csv_data.describe()
 
-  return row_count
+  return csv_data.shape[1], summary.to_json()
 
 
-def upload_report(bucket_name, data):
+def upload_report(bucket_name, filename, data):
   """ Upload report data."""
 
   date_obj = dt.datetime.now()
@@ -76,7 +73,7 @@ def upload_report(bucket_name, data):
   else:
     client = boto3.client('s3')
 
-  client.upload_file('data.json', bucket_name, f'report_{date_obj.strftime("%d-%m-%Y")}.json')
+  client.upload_file('data.json', bucket_name, f'{filename}_{date_obj.strftime("%d-%m-%Y")}.json')
 
 
 if __name__ == "__main__":
@@ -89,6 +86,6 @@ if __name__ == "__main__":
   zip_file = download_zip(ingress_bucket, filename)
   files = extract_files(zip_file, "*.csv")
   for file in files:
-    count = parse_file(file)
-    print(f"Parsed: {file} - {count}")
-  upload_report(report_bucket, { "parsedCount": count })
+    count, summary = parse_file(file)
+    filename, ext = os.path.splitext(os.path.basename(file))
+    upload_report(report_bucket, filename, summary)

@@ -2,11 +2,12 @@
 
 _Simple example app of reading file from event bucket, doing some processing and uploading output to report bucket_
 
-- Uses [boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/quickstart.html/) for aws services.
+- [boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/quickstart.html/) used for aws services.
+- [pandas](https://pandas.pydata.org) used for data analysis
 
 ## Local S3
 
-- Uses [Minio](https://hub.docker.com/r/bitnami/minio) for local S3 storage.
+- [Minio](https://hub.docker.com/r/bitnami/minio) used for local S3 storage.
 
 ```
 yarn s3:start
@@ -20,6 +21,10 @@ Setup bucket and add file [Minio Admin](http://localhost:9001/).
 | MINIO_ROOT_PASSWORD | miniosecret |
 
 An access key and secret key will also be needed
+
+### Test Data
+
+Data set from [Kaggle](https://www.kaggle.com/datasets?topic=trendingDataset)
 
 ## Enviroment
 
@@ -41,7 +46,8 @@ yarn s3:stop
 
 ## Tests
 
-- Uses [moto](http://docs.getmoto.org/en/latest/) for mocking aws services.
+- [moto](http://docs.getmoto.org/en/latest/) used for mocking aws services.
+- [pytest](https://docs.pytest.org/en/8.0.x/) used for testing.
 
 ### Usage
 
