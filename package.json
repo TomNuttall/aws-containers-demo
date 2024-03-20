@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "cd app && docker compose --profile prod up --build demo-ecs && docker image prune -f",
     "s3:start": "cd app && docker compose --profile prod up -d s3",
-    "s3:stop": "cd app && docker compose down",
+    "s3:stop": "docker stop $(docker ps -q)",
     "test": "cd app && docker compose --profile test up --build && docker image prune -f"
   }
 }
