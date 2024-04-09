@@ -11,6 +11,14 @@ Consideration given to using a private subnet with S3 gateway endpoints and ECR 
 
 Therefore for this demo running with cheaper costs the VPC uses an Internet gateway for access to other aws services (ECR, S3, CloudFront).
 
+<img
+  src='../diagrams/vpc_diagram.png'
+  raw=true
+  alt='AWS VPC Diagram'
+  width="100%"
+  height="auto"
+/>
+
 ## Architecture Diagram
 
 <img
