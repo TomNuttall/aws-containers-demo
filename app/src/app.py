@@ -83,9 +83,13 @@ if __name__ == "__main__":
   report_bucket = os.environ.get("REPORT_BUCKET")
   filename = os.environ.get("S3_KEY")
 
+  print(f"Generate reports for {filename}")
+
   zip_file = download_zip(ingress_bucket, filename)
   files = extract_files(zip_file, "*.csv")
   for file in files:
     count, summary = parse_file(file)
     filename, ext = os.path.splitext(os.path.basename(file))
     upload_report(report_bucket, filename, summary)
+
+  print(f"Completed upload")

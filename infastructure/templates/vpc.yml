@@ -1,0 +1,129 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: 'ECS VPC'
+
+Parameters:
+  ProjectPrefix:
+    Type: String
+    Default: 'demo'
+    Description: 'Name of Project prefix'
+  ProjectName:
+    Type: String
+    Description: 'Name of Project'
+
+Resources:
+  VPC:
+    Type: 'AWS::EC2::VPC'
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+
+  GatewayAttachement:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: GatewayAttachement
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  SubnetA:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.0.0/24
+      AvailabilityZone: !Select [0, !GetAZs ]
+      MapPublicIpOnLaunch: true
+
+  PublicSubnetARoute:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref SubnetA
+      RouteTableId: !Ref PublicRouteTable
+
+  SecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupName: !Sub '${ProjectPrefix}-sg-${ProjectName}'
+      GroupDescription: 'ECR access'
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+
+  S3Endpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcEndpointType: Gateway
+      RouteTableIds:
+        - !Ref PrivateRouteTable
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.s3
+      VpcId: !Ref VPC
+
+  # See readme notes
+  # PrivayeSubnetARoute:
+  #   Type: AWS::EC2::SubnetRouteTableAssociation
+  #   Properties:
+  #     SubnetId: !Ref SubnetA
+  #     RouteTableId: !Ref PrivateRouteTable
+
+  # CloudWatchLogsEndpoint:
+  #   Type: AWS::EC2::VPCEndpoint
+  #   Properties:
+  #     VpcEndpointType: Interface
+  #     PrivateDnsEnabled: true
+  #     SubnetIds:
+  #       - !Ref SubnetA
+  #     SecurityGroupIds:
+  #       - !Ref SecurityGroup
+  #     ServiceName: !Sub com.amazonaws.${AWS::Region}.logs
+  #     VpcId: !Ref VPC
+
+  # EcrApiEndpoint:
+  #   Type: AWS::EC2::VPCEndpoint
+  #   Properties:
+  #     VpcEndpointType: Interface
+  #     PrivateDnsEnabled: true
+  #     SubnetIds:
+  #       - !Ref SubnetA
+  #     SecurityGroupIds:
+  #       - !Ref SecurityGroup
+  #     ServiceName: !Sub com.amazonaws.${AWS::Region}.ecr.api
+  #     VpcId: !Ref VPC
+
+  # EcrDkrEndpoint:
+  #   Type: AWS::EC2::VPCEndpoint
+  #   Properties:
+  #     VpcEndpointType: Interface
+  #     PrivateDnsEnabled: true
+  #     SubnetIds:
+  #       - !Ref SubnetA
+  #     SecurityGroupIds:
+  #       - !Ref SecurityGroup
+  #     ServiceName: !Sub com.amazonaws.${AWS::Region}.ecr.dkr
+  #     VpcId: !Ref VPC
