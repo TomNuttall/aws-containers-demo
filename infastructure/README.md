@@ -29,4 +29,12 @@ Therefore for this demo running with cheaper costs the VPC uses an Internet gate
   height="auto"
 />
 
+Alternative private VPC
 
+<img
+  src='../diagrams/vpc_diagram_alt.png'
+  raw=true
+  alt='AWS VPC Diagram'
+  width="100%"
+  height="auto"
+/>
