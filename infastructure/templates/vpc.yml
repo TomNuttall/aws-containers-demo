@@ -32,11 +32,6 @@ Resources:
     Properties:
       VpcId: !Ref VPC
 
-  PrivateRouteTable:
-    Type: AWS::EC2::RouteTable
-    Properties:
-      VpcId: !Ref VPC
-
   PublicRoute:
     Type: AWS::EC2::Route
     DependsOn: GatewayAttachement
@@ -76,12 +71,18 @@ Resources:
     Properties:
       VpcEndpointType: Gateway
       RouteTableIds:
-        - !Ref PrivateRouteTable
+        - !Ref PublicRouteTable
       ServiceName: !Sub com.amazonaws.${AWS::Region}.s3
       VpcId: !Ref VPC
 
-  # See readme notes
-  # PrivayeSubnetARoute:
+  # See readme note (would remove igw)
+
+  # PrivateRouteTable:
+  #   Type: AWS::EC2::RouteTable
+  #   Properties:
+  #   VpcId: !Ref VPC
+  
+  # PrivateSubnetARoute:
   #   Type: AWS::EC2::SubnetRouteTableAssociation
   #   Properties:
   #     SubnetId: !Ref SubnetA
