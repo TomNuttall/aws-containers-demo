@@ -63,13 +63,8 @@ Resources:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
       GroupName: !Sub '${ProjectPrefix}-sg-${ProjectName}'
-      GroupDescription: 'ECR access'
+      GroupDescription: 'Outbound access needed for AWS services'
       VpcId: !Ref VPC
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 443
-          ToPort: 443
-          CidrIp: 0.0.0.0/0
       SecurityGroupEgress:
         - IpProtocol: tcp
           FromPort: 443
