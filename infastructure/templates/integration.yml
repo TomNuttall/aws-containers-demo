@@ -13,7 +13,7 @@ Parameters:
     Type: String
     Description: 'Repo Path i.e GitHubUser/RepoName'
   Subnet:
-    Type: String
+    Type: List<String>
     Description: 'VPC Subnet'
   SecurityGroup:
     Type: String
@@ -91,8 +91,7 @@ Resources:
                 AssignPublicIp: ENABLED
                 SecurityGroups:
                   - !Ref SecurityGroup
-                Subnets:
-                  - !Ref Subnet
+                Subnets: !Ref Subnet
 
   EventRole:
     Type: 'AWS::IAM::Role'
