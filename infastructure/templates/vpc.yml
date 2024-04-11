@@ -40,19 +40,37 @@ Resources:
       DestinationCidrBlock: 0.0.0.0/0
       GatewayId: !Ref InternetGateway
 
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+
   SubnetA:
     Type: 'AWS::EC2::Subnet'
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: 10.0.0.0/24
+      CidrBlock: 10.0.0.0/20
       AvailabilityZone: !Select [0, !GetAZs ]
       MapPublicIpOnLaunch: true
 
-  PublicSubnetARoute:
+  SubnetB:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.0.0/24
+      AvailabilityZone: !Select [1, !GetAZs ]
+
+  PublicSubnetRoute:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       SubnetId: !Ref SubnetA
       RouteTableId: !Ref PublicRouteTable
+
+  PrivateSubnetRoute:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref SubnetB
+      RouteTableId: !Ref PrivateRouteTable
 
   SecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
@@ -71,30 +89,19 @@ Resources:
     Properties:
       VpcEndpointType: Gateway
       RouteTableIds:
-        - !Ref PublicRouteTable
+        - !Ref PrivateRouteTable
       ServiceName: !Sub com.amazonaws.${AWS::Region}.s3
       VpcId: !Ref VPC
 
-  # See readme note (would remove igw)
-
-  # PrivateRouteTable:
-  #   Type: AWS::EC2::RouteTable
-  #   Properties:
-  #   VpcId: !Ref VPC
+  # See readme note
   
-  # PrivateSubnetARoute:
-  #   Type: AWS::EC2::SubnetRouteTableAssociation
-  #   Properties:
-  #     SubnetId: !Ref SubnetA
-  #     RouteTableId: !Ref PrivateRouteTable
-
   # CloudWatchLogsEndpoint:
   #   Type: AWS::EC2::VPCEndpoint
   #   Properties:
   #     VpcEndpointType: Interface
   #     PrivateDnsEnabled: true
   #     SubnetIds:
-  #       - !Ref SubnetA
+  #       - !Ref SubnetB
   #     SecurityGroupIds:
   #       - !Ref SecurityGroup
   #     ServiceName: !Sub com.amazonaws.${AWS::Region}.logs
@@ -106,7 +113,7 @@ Resources:
   #     VpcEndpointType: Interface
   #     PrivateDnsEnabled: true
   #     SubnetIds:
-  #       - !Ref SubnetA
+  #       - !Ref SubnetB
   #     SecurityGroupIds:
   #       - !Ref SecurityGroup
   #     ServiceName: !Sub com.amazonaws.${AWS::Region}.ecr.api
@@ -118,7 +125,7 @@ Resources:
   #     VpcEndpointType: Interface
   #     PrivateDnsEnabled: true
   #     SubnetIds:
-  #       - !Ref SubnetA
+  #       - !Ref SubnetB
   #     SecurityGroupIds:
   #       - !Ref SecurityGroup
   #     ServiceName: !Sub com.amazonaws.${AWS::Region}.ecr.dkr
