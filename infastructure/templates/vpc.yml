@@ -18,33 +18,6 @@ Resources:
       EnableDnsSupport: true
       EnableDnsHostnames: true
 
-  InternetGateway:
-    Type: AWS::EC2::InternetGateway
-
-  GatewayAttachement:
-    Type: AWS::EC2::VPCGatewayAttachment
-    Properties:
-      VpcId: !Ref VPC
-      InternetGatewayId: !Ref InternetGateway
-
-  PublicRouteTable:
-    Type: AWS::EC2::RouteTable
-    Properties:
-      VpcId: !Ref VPC
-
-  PublicRoute:
-    Type: AWS::EC2::Route
-    DependsOn: GatewayAttachement
-    Properties:
-      RouteTableId: !Ref PublicRouteTable
-      DestinationCidrBlock: 0.0.0.0/0
-      GatewayId: !Ref InternetGateway
-
-  PrivateRouteTable:
-    Type: AWS::EC2::RouteTable
-    Properties:
-      VpcId: !Ref VPC
-
   SubnetA:
     Type: 'AWS::EC2::Subnet'
     Properties:
@@ -60,11 +33,21 @@ Resources:
       CidrBlock: 10.0.0.0/24
       AvailabilityZone: !Select [1, !GetAZs ]
 
-  PublicSubnetRoute:
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+
+ PublicSubnetRoute:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       SubnetId: !Ref SubnetA
       RouteTableId: !Ref PublicRouteTable
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
 
   PrivateSubnetRoute:
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -83,6 +66,23 @@ Resources:
           FromPort: 443
           ToPort: 443
           CidrIp: 0.0.0.0/0
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+
+  GatewayAttachement:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+  GatewayRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+  DependsOn: GatewayAttachement
 
   S3Endpoint:
     Type: AWS::EC2::VPCEndpoint
