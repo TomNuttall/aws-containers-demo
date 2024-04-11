@@ -19,7 +19,7 @@
 
 Consideration given to using a private subnet with S3 gateway endpoints and ECR interface endpoints. There is however an additional cost to having the interface endpoints provisioned even when not in use.
 
-Therefore for this demo running with cheaper costs the VPC uses an Internet gateway. This has a security group for outbound access to other aws services such as ECR and CloudFront but no inbound access. The S3 endpoint uses a private subnet with an S3 gateway endpoint since this has no cost.
+Therefore for this demo running with cheaper costs the VPC uses an Internet gateway. This has a security group for outbound access to other aws services such as ECR and CloudFront but no inbound access. Theres is an S3 endpoint added to the public subnet since this has no cost.
 
 <img
   src='../diagrams/vpc_diagram.png'
@@ -29,7 +29,7 @@ Therefore for this demo running with cheaper costs the VPC uses an Internet gate
   height="auto"
 />
 
-Alternative private VPC
+Alternative private subnet VPC
 
 <img
   src='../diagrams/vpc_diagram_alt.png'

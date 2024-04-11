@@ -12,14 +12,14 @@ Parameters:
 
 Resources:
   VPC:
-    Type: 'AWS::EC2::VPC'
+    Type: AWS::EC2::VPC
     Properties:
       CidrBlock: 10.0.0.0/16
       EnableDnsSupport: true
       EnableDnsHostnames: true
 
   PublicSubnet:
-    Type: 'AWS::EC2::Subnet'
+    Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
       CidrBlock: 10.0.1.0/24
@@ -27,7 +27,7 @@ Resources:
       MapPublicIpOnLaunch: true
 
   PrivateSubnet:
-    Type: 'AWS::EC2::Subnet'
+    Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
       CidrBlock: 10.0.2.0/24
@@ -89,6 +89,7 @@ Resources:
     Properties:
       VpcEndpointType: Gateway
       RouteTableIds:
+        - !Ref PublicRouteTable
         - !Ref PrivateRouteTable
       ServiceName: !Sub com.amazonaws.${AWS::Region}.s3
       VpcId: !Ref VPC
