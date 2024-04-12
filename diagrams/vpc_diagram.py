@@ -15,12 +15,11 @@ with Diagram("", filename="vpc_diagram", outformat="png"):
     s3 = S3("S3")
     
     with Cluster("VPC"):
+      igw = InternetGateway("Internet\nGateway")
+      s3Endpoint = Endpoint("VPC Gateway\nEndpoint")
 
       with Cluster("Public Subnet"):
-        publicSubnet = PublicSubnet("Public Subnet")
-
-        igw = InternetGateway("Internet\nGateway")
-        s3Endpoint = Endpoint("VPC Gateway\nEndpoint")
+        publicSubnet = PublicSubnet("Public Subnet")        
         ecs = ECS("ECS Task")
 
       ecs >>  igw

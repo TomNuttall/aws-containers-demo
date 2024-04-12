@@ -17,7 +17,7 @@ with Diagram("", filename="vpc_diagram_alt", outformat="png"):
         ecs = ECS("ECS Task")
         privateSubnet = PrivateSubnet("Private Subnet")
 
-        ecs >> Endpoint("VPC Gateway\nEndpoint") >> Edge(label="") << s3
-        ecs >> Endpoint("VPC Endpoint") >> Edge(label="") << ecr
-        ecs >> Endpoint("VPC Endpoint") >> Edge(label="") << logs
+      ecs >> Endpoint("VPC Gateway\nEndpoint") >> Edge(label="") << s3
+      ecs >> Endpoint("VPC Endpoint") >> Edge(label="") << ecr
+      ecs >> Endpoint("VPC Endpoint") >> Edge(label="") << logs
   
