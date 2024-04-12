@@ -13,12 +13,11 @@ with Diagram("", filename="vpc_diagram_alt", outformat="png"):
     
     
     with Cluster("VPC"):
-      ecs = ECS("ECS Task")
-      privateSubnet = PrivateSubnet("Private Subnet")
+      with Cluster("Private Subnet"):
+        ecs = ECS("ECS Task")
+        privateSubnet = PrivateSubnet("Private Subnet")
 
-      ecs >> privateSubnet 
-
-      privateSubnet >> Endpoint("VPC Gateway\nEndpoint") >> s3
-      privateSubnet >> Endpoint("VPC Endpoint") >> ecr
-      privateSubnet >> Endpoint("VPC Endpoint") >> logs
+        ecs >> Endpoint("VPC Gateway\nEndpoint") >> Edge(label="") << s3
+        ecs >> Endpoint("VPC Endpoint") >> Edge(label="") << ecr
+        ecs >> Endpoint("VPC Endpoint") >> Edge(label="") << logs
   
