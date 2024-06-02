@@ -51,7 +51,7 @@ def temp_folder(tmp_path):
 
 @mock_aws
 def test_generate_report(zip_file, temp_folder):
-    """ It should extract zip and return only csv matches."""
+    """ It should create report from csv file."""
 
     # Arrange
     s3 = boto3.client('s3', region_name='eu-west-2')
