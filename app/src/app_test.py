@@ -43,7 +43,7 @@ def zip_file(tmp_path):
 
 @pytest.fixture
 def temp_folder(tmp_path):
-    """ Mock Zip file data."""
+    """ Mock temp folder."""
 
     temp_dir = tmp_path / 'temp'
     temp_dir.mkdir()
