@@ -3,8 +3,8 @@ WORKDIR /usr/src/app
 
 # Prod
 FROM base as prod
-COPY ./src/requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+COPY ./requirements-prod.txt ./
+RUN pip install --no-cache-dir -r requirements-prod.txt
 
 COPY ./src .
 
@@ -12,13 +12,9 @@ CMD [ "python", "./app.py" ]
 
 # Test
 FROM base as test
-COPY ./src/requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
-
-COPY ./tests/requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+COPY ./requirements-dev.txt ./
+RUN pip install --no-cache-dir -r requirements-dev.txt
 
 COPY ./src ./src
-COPY ./tests ./tests
 
 RUN pytest
