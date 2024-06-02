@@ -8,7 +8,6 @@ from moto import mock_aws
 from zipfile import ZipFile
 
 ZIP_FILENAME = "test.zip"
-REPORT_FILENAME = 'report_01-01-2024.json'
 INGRESS_BUCKET = "ingress-bucket"
 REPORT_BUCKET = "report-bucket"
 
