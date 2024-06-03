@@ -39,7 +39,7 @@ if __name__ == "__main__":
     reportsS3 = S3Helper(os.environ.get("REPORT_BUCKET"), development)
 
     report_file = os.environ.get("S3_KEY")
-    working_folder = '/tmp'
+    working_folder = ''
 
     app = App(parser, ingressS3, reportsS3)
     app.generate_report(report_file, working_folder)
