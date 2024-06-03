@@ -8,7 +8,6 @@ from moto import mock_aws
 from zipfile import ZipFile
 
 ZIP_FILENAME = "test.zip"
-REPORT_FILENAME = 'report_01-01-2024.json'
 INGRESS_BUCKET = "ingress-bucket"
 REPORT_BUCKET = "report-bucket"
 
@@ -43,7 +42,7 @@ def zip_file(tmp_path):
 
 @pytest.fixture
 def temp_folder(tmp_path):
-    """ Mock Zip file data."""
+    """ Mock temp folder."""
 
     temp_dir = tmp_path / 'temp'
     temp_dir.mkdir()
@@ -52,7 +51,7 @@ def temp_folder(tmp_path):
 
 @mock_aws
 def test_generate_report(zip_file, temp_folder):
-    """ It should extract zip and return only csv matches."""
+    """ It should create report from csv file."""
 
     # Arrange
     s3 = boto3.client('s3', region_name='eu-west-2')
