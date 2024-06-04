@@ -1,6 +1,6 @@
 import os
 import modules.Utils as Utils
-from modules.Parser import Parser
+from parser.Parser import Parser
 from modules.S3Helper import S3Helper
 
 

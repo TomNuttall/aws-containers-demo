@@ -1,6 +1,6 @@
 import csv
 import pytest
-from modules.Parser import Parser
+from parser.Parser import Parser
 
 
 @pytest.fixture

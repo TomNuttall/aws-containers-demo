@@ -2,7 +2,7 @@ import boto3
 import csv
 import pytest
 from app import App
-from modules.Parser import Parser
+from parser.Parser import Parser
 from modules.S3Helper import S3Helper
 from moto import mock_aws
 from zipfile import ZipFile
