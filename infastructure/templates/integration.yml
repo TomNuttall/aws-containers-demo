@@ -215,17 +215,29 @@ Resources:
         LifecyclePolicyText: |
           {
             "rules": [
-            {
-              "rulePriority": 1,
-              "description": "Remove untagged images",
-              "selection": {
-                "tagStatus": "untagged",
-                "countType": "sinceImagePushed",
-                "countUnit": "days",
-                "countNumber": 1
+              {
+                "rulePriority": 1,
+                "description": "Remove untagged images",
+                "selection": {
+                  "tagStatus": "untagged",
+                  "countType": "sinceImagePushed",
+                  "countUnit": "days",
+                  "countNumber": 1
+                },
+                "action": { "type": "expire" }
               },
-              "action": { "type": "expire" }
-            }]
+              {
+                "rulePriority": 2,
+                "description": "Remove tagged images",
+                "selection": {
+                  "tagStatus": "tagged",
+                  "tagPatternList": ["*"],
+                  "countType": "imageCountMoreThan",
+                  "countNumber": 1
+                },
+                "action": { "type": "expire" }
+              }
+            ]
           }
       ImageScanningConfiguration:
         ScanOnPush: true
