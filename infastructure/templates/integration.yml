@@ -220,7 +220,8 @@ Resources:
               "description": "Remove untagged images",
               "selection": {
                 "tagStatus": "untagged",
-                "countType": "imageCountMoreThan",
+                "countType": "sinceImagePushed",
+                "countUnit": "days",
                 "countNumber": 1
               },
               "action": { "type": "expire" }
