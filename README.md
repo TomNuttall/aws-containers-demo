@@ -1,6 +1,6 @@
 # aws-containers-demo
 
-Demo Project to explore setting up a Container workflow.
+Demo Project to explore setting up a Container workflow with ECR, ECS, Fargate and Docker.
 
 Event from S3 on uploading zip files launches ECS task to process file and upload some results to an S3 bucket.
 
