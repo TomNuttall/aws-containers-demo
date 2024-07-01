@@ -49,8 +49,6 @@ yarn s3:stop
 - [moto](http://docs.getmoto.org/en/latest/) used for mocking aws services.
 - [pytest](https://docs.pytest.org/en/8.0.x/) used for testing.
 
-### Usage
-
 ```
 yarn test
 ```
