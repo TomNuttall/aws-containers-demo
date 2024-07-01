@@ -5,7 +5,7 @@ from diagrams.aws.storage import S3
 from diagrams.aws.management import Cloudwatch
 from diagrams.onprem.network import Internet
 
-with Diagram("", filename="vpc_diagram", outformat="png", direction="TB"):
+with Diagram("", filename="vpc_diagram", outformat="png"):
 
     internet = Internet("Internet")
 
@@ -25,5 +25,5 @@ with Diagram("", filename="vpc_diagram", outformat="png", direction="TB"):
         ecs >> igw
         ecs >> s3Endpoint >> s3
 
-    igw >> Edge(label="") << internet
+    igw >> Edge(label="") >> internet
     internet >> [ecr, logs]
