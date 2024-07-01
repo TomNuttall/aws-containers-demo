@@ -3,7 +3,7 @@
 ## Overview
 
 - CloudFormation: Used to deploy infastructure on AWS.
-- GitHub action: deploy.yml runs on change to app folder. Builds app image and pushes to ECR
+- GitHub action: deploy.yml runs on change to app folder. Builds and tests app image and pushes to ECR
 
 ## Architecture Diagram
 
