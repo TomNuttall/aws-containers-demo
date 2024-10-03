@@ -37,6 +37,32 @@ Data set from [Kaggle](https://www.kaggle.com/datasets?topic=trendingDataset)
 | MINIO_ACCESS_KEY | minio                    |
 | MINIO_SECRET_KEY | miniosecret              |
 
+## Install
+
+VirtualEnv
+
+```bash
+python3 -m venv env
+source env/bin/activate
+```
+
+Install packages
+
+```bash
+pip install -r ./requirements-dev.txt
+```
+
+Dependancy upgrade
+
+```bash
+rm -rf env
+python3 -m venv env
+source env/bin/activate
+pip install -r ./requirements-dev.txt
+pip-review --local --auto
+pip freeze >requirements-dev.txt
+```
+
 ## Run Locally
 
 ```
