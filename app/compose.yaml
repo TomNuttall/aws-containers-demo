@@ -12,7 +12,7 @@ services:
     profiles: [prod]
 
   s3:
-    image: bitnami/minio:latest
+    image: soldevelo/minio:latest
     volumes:
       - 'minio_data:/data'
     ports:
